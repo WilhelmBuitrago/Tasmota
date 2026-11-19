@@ -1,0 +1,35 @@
+
+name: Build Tasmota Telegram ESP8266
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Tasmota
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Install PlatformIO
+        run: pip install pioarduino
+
+      - name: Configure custom PlatformIO
+        run: cp platformio_override_sample.ini platformio_override.ini
+
+      - name: Build Tasmota with Telegram
+        run: platformio run -e tasmota
+
+      - name: Upload firmware
+        uses: actions/upload-artifact@v4
+        with:
+          name: tasmota-esp8266-telegram
+          path: build_output/firmware/
+          if-no-files-found: error
+          retention-days: 7
